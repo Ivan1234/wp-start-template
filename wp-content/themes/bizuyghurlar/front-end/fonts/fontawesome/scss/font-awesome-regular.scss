@@ -1,0 +1,17 @@
+@import "variables";
+
+@font-face {
+  font-family: "Font Awesome 5";
+  src: url("#{$fa-font-path}/fontawesome-regular-400.eot?v=#{$fa-version}");
+  src: url("#{$fa-font-path}/fontawesome-regular-400.eot?#iefix&v=#{$fa-version}") format("embedded-opentype"),
+  url("#{$fa-font-path}/fontawesome-regular-400.woff2?v=#{$fa-version}") format("woff2"),
+  url("#{$fa-font-path}/fontawesome-regular-400.woff?v=#{$fa-version}") format("woff"),
+  url("#{$fa-font-path}/fontawesome-regular-400.ttf?v=#{$fa-version}") format("truetype"),
+  url("#{$fa-font-path}/fontawesome-regular-400.svg?v=#{$fa-version}#fontawesomeregular") format("svg");
+  font-weight: 400;
+  font-style: normal;
+}
+
+.far {
+  font-weight: 400;
+}
