@@ -108,4 +108,98 @@ add_action( 'after_setup_theme', 'bizuyghurlar_setup' );
     ) ) );
 }
 add_action( 'customize_register', 'starter_customize_register');*/
-?>
+
+function get_intro_post ($post_obj) { 
+	if ($post_obj) {
+		ob_start(); ?>
+		<div class="home-intro__item">
+			<?php
+			$excerpt = get_the_excerpt( $post_obj );
+			$thumbnail = get_the_post_thumbnail( $post_obj->ID, 'large' ); 
+			if ($thumbnail) { ?>
+				<div class="home-intro__image">
+					<span class="home-intro__label">
+						<?php _e('Последние новости', 'bizuyghurlar'); ?>
+					</span>
+					<a href="<?php echo get_permalink($post_obj); ?>">
+						<?php echo $thumbnail; ?>
+					</a>
+				</div>
+			<?php } ?>
+			<div class="home-intro__title">
+				<a href="<?php echo get_permalink($post_obj); ?>">
+					<?php echo $post_obj->post_title; ?>
+				</a>
+			</div>
+			<div class="home-intro__excerpt">
+				<?php 
+				if ($post_obj->post_excerpt) {
+					echo $post_obj->post_excerpt;
+				} else {
+					echo wp_trim_words( $post_obj->post_content, 28, ' ...' );	
+				} ?>
+			</div>
+			<div class="home-intro__read_more">
+				<a href="<?php echo get_permalink($post_obj); ?>">
+					<?php _e('Читать далее', 'bizuyghurlar'); ?>
+				</a>
+			</div>
+		</div>
+		<?php 
+		$result = ob_get_contents();
+		ob_clean();
+		return $result;
+	}
+	return '';
+}
+
+
+// Add term page
+function bizuyghurlar_category_add_new_meta_field() {
+    // this will add the custom meta field to the add new term page
+    ?>
+    <div class="form-field">
+        <label for="term_meta[custom_color]"><?php _e( 'Сolor', 'bizuyghurlar' ); ?></label>
+        <input type="color" name="term_meta[custom_color]" id="term_meta[custom_color]" value="">
+        <p class="description"><?php _e( 'Enter a value for this field','bizuyghurlar' ); ?></p>
+    </div>
+<?php
+}
+add_action( 'category_add_form_fields', 'bizuyghurlar_category_add_new_meta_field', 10, 2 );
+
+// Edit term page
+function bizuyghurlar_category_edit_meta_field($term) {
+ 
+    // put the term ID into a variable
+    $t_id = $term->term_id;
+ 
+    // retrieve the existing value(s) for this meta field. This returns an array
+    $term_meta = get_option( "taxonomy_$t_id" ); ?>
+    <tr class="form-field">
+    <th scope="row" valign="top"><label for="term_meta[custom_color]"><?php _e( 'Сolor', 'bizuyghurlar' ); ?></label></th>
+        <td>
+            <input type="color" name="term_meta[custom_color]" id="term_meta[custom_color]" value="<?php echo esc_attr( $term_meta['custom_color'] ) ? esc_attr( $term_meta['custom_color'] ) : ''; ?>">
+            <p class="description"><?php _e( 'Enter a value for this field','bizuyghurlar' ); ?></p>
+        </td>
+    </tr>
+<?php
+}
+add_action( 'category_edit_form_fields', 'bizuyghurlar_category_edit_meta_field', 10, 2 );
+
+// Save extra taxonomy fields callback function.
+function save_category_custom_meta( $term_id ) {
+    if ( isset( $_POST['term_meta'] ) ) {
+        $t_id = $term_id;
+        $term_meta = get_option( "taxonomy_$t_id" );
+        $cat_keys = array_keys( $_POST['term_meta'] );
+        foreach ( $cat_keys as $key ) {
+            if ( isset ( $_POST['term_meta'][$key] ) ) {
+                $term_meta[$key] = $_POST['term_meta'][$key];
+            }
+        }
+        // Save the option array.
+        update_option( "taxonomy_$t_id", $term_meta );
+    }
+}  
+add_action( 'edited_category', 'save_category_custom_meta', 10, 2 );  
+add_action( 'create_category', 'save_category_custom_meta', 10, 2 );
